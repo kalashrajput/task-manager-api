@@ -1,18 +1,21 @@
 # Task Manager API
 
-A simple RESTful Task Manager API built with **FastAPI** and **SQLite**, fully containerized using **Docker**.
+A RESTful Task Manager API built with **FastAPI** and **PostgreSQL**, fully containerized using **Docker** and orchestrated with **Docker Compose**.
 
 ## Features
 - Create, read, update, and delete tasks (CRUD)
 - Task fields: title, description, due date, completion status
 - Auto-generated interactive API docs (Swagger UI)
-- SQLite database for persistence
-- Fully Dockerized for consistent deployment across environments
+- PostgreSQL database with persistent storage via Docker volumes
+- Multi-container setup (app + database) connected over a custom Docker network
+- Multi-stage Dockerfile for a lean, production-style image
+- Environment-based configuration using `.env`
 
 ## Tech Stack
 - **Backend:** FastAPI (Python)
-- **Database:** SQLite with SQLAlchemy ORM
-- **Containerization:** Docker
+- **Database:** PostgreSQL with SQLAlchemy ORM
+- **Containerization:** Docker (multi-stage build)
+- **Orchestration:** Docker Compose
 
 ## API Endpoints
 
@@ -25,42 +28,49 @@ A simple RESTful Task Manager API built with **FastAPI** and **SQLite**, fully c
 | PUT    | `/tasks/{task_id}` | Update a task         |
 | DELETE | `/tasks/{task_id}` | Delete a task          |
 
-## Running with Docker
+## Running with Docker Compose
 
-### Build the image
+### 1. Create a `.env` file in the project root
+POSTGRES_USER=your_username
+POSTGRES_PASSWORD=your_password
+POSTGRES_DB=your_dbname
+
+### 2. Build and start the containers
 ```bash
-docker build -t task-manager-api .
+docker compose up --build
 ```
 
-### Run the container
-```bash
-docker run -d -p 8000:8000 --name task-manager-container task-manager-api
-```
+This starts two services:
+- `app` — the FastAPI application (port `8000`)
+- `db` — PostgreSQL database with persistent volume storage
 
-### Access the API
+### 3. Access the API
 Open your browser at:
 http://127.0.0.1:8000/docs
 
-### Stop the container
+### 4. Stop the containers
 ```bash
-docker stop task-manager-container
+docker compose down
 ```
 
 ## Running Locally (without Docker)
 
 ```bash
-python -m venv venv
-venv\Scripts\activate
+python3 -m venv venv
+source venv/bin/activate
 pip install -r requirements.txt
 uvicorn main:app --reload
 ```
+> Note: Running locally without Docker will fall back to a local SQLite database unless a `DATABASE_URL` environment variable is set.
 
 ## Project Structure
-task-manager/
-├── main.py           # FastAPI app & routes
-├── database.py       # DB connection setup
-├── models.py         # SQLAlchemy models
-├── schemas.py        # Pydantic schemas
-├── requirements.txt  # Dependencies
-├── Dockerfile
-└── .dockerignore
+task-manager-api/
+├── main.py              # FastAPI app & routes
+├── database.py          # DB connection setup (env-based)
+├── models.py            # SQLAlchemy models
+├── schemas.py           # Pydantic schemas
+├── requirements.txt     # Dependencies
+├── Dockerfile            # Multi-stage build
+├── docker-compose.yml   # App + Postgres orchestration
+├── .dockerignore
+└── .gitignore
