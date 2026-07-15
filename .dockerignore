@@ -3,4 +3,7 @@ __pycache__/
 tasks.db
 *.pyc
 .git/
-.gitignore 
+.gitignore
+.env
+Dockerfile
+docker-compose.yml
