@@ -1,17 +1,25 @@
 name: Hello World Workflow
 
-on: push
+on:
+    push:
+        branches: [main]
+    workflow_dispatch: 
 
 jobs:
     greet:
         runs-on: ubuntu-latest
+        env:
+            job_var: "This is a job-level environment variable"
         steps:
             - name: Say Hello
-              run: echo "Hello World from github actions"
+              run: | 
+                echo "Hello World from github actions"
+                echo "This is a sample workflow to demonstrate multi-line commands in a single step"
+                echo "Job variable value: $job_var"
 
             - name: Show current date
               run: date
 
             - name: list current directories
               run: ls -la
-
+              
